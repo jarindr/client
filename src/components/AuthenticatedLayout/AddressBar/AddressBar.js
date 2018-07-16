@@ -29,6 +29,7 @@ export default class AddressBar extends React.Component {
   componentDidUpdate(prevProps, _prevState) {
     if (this.props.query !== prevProps.query) {
       this.searchInput.current.value = this.props.query;
+      this.props.doQuery(this.searchInput.current.value);
     }
   }
 
