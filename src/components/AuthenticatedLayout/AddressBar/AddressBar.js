@@ -6,24 +6,25 @@ import { func, string, shape } from 'prop-types';
 import ButtonBar from '../ButtonBar';
 import styles from './AddressBar.scss';
 
-const RETURN_KEY = 13;
-
 const historyShape = shape({
   push: func.isRequired
 });
-
+const locationShape = shape({
+  pathname: string.isRequired
+});
 export default class AddressBar extends React.Component {
   static propTypes = {
     doQuery: func.isRequired,
     query: string,
-    history: historyShape.isRequired
-  };
+    history: historyShape.isRequired,
+    location: locationShape.isRequired
+  }
 
   static defaultProps = {
     query: null
-  };
+  }
 
-  searchInput = React.createRef();
+  searchInput = React.createRef()
 
   componentDidUpdate(prevProps, _prevState) {
     if (this.props.query !== prevProps.query) {
@@ -33,29 +34,24 @@ export default class AddressBar extends React.Component {
 
   render() {
     return (
-      <div className={styles.addressBar}>
+      <form className={styles.addressBar} onSubmit={this.handleSubmitAddress}>
         <input
           type="text"
           placeholder="Search or enter address"
-          onKeyUp={this.handleKeyUp}
           ref={this.searchInput}
           defaultValue={this.props.query}
         />
         <ButtonBar />
-      </div>
+      </form>
     );
   }
 
-  handleKeyUp = (event) => {
-    const { query, doQuery } = this.props;
-
-    if (event.which === RETURN_KEY) {
-      const { value } = event.target;
-
-      if (value !== query) {
-        doQuery(value);
-      }
+  handleSubmitAddress = (e) => {
+    e.preventDefault();
+    this.props.doQuery(this.searchInput.current.value);
+    this.searchInput.current.blur();
+    if (this.props.location.pathname !== '/browser') {
       this.props.history.push('/browser');
     }
-  };
+  }
 }
